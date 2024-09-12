@@ -1,12 +1,5 @@
-function removeVowels(string) {
-    const vowels = 'аеёиоуыэюяaeiouy'
-    let result = ''
-    string.split('').forEach(letter => {
-        if (!vowels.includes(letter.toLowerCase())) {
-            result += letter
-        }
-    })
-    return result
+function reverseString(string) {
+    return string.split('').reverse().join('')
 }
 
-console.log(removeVowels('Привет, мир!'))
+console.log(reverseString('string'))
