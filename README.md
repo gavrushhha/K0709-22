@@ -23,3 +23,95 @@
 ## Дополнительное задание
 - Создайте функцию reverseString, которая принимает строку и возвращает ее в перевернутом виде.
 - Напишите функцию, которая принимает строку и возвращает ее, удалив все гласные буквы.
+
+Аргун В. Г. (К0709-22)
+
+// 1
+function isPrime(num) {
+  if (num <= 1) return false;
+  for (let i = 2; i < num; i++) {
+    if (num % i === 0) return false;
+  }
+  return true;
+}
+
+for (let i = 2; i <= 20; i++) {
+  console.log(`${i} is prime: ${isPrime(i)}`);
+}
+
+// 2
+let randomNumbers = Array.from({ length: 10 }, () => Math.floor(Math.random() * 100));
+
+function findMinMax(arr) {
+  return {
+    min: Math.min(...arr),
+    max: Math.max(...arr)
+  };
+}
+
+console.log(randomNumbers);
+console.log(findMinMax(randomNumbers));
+
+// 3
+let user = {
+  name: "Иван",
+  age: 30,
+  email: "ivan@example.com",
+  greet() {
+    console.log(`Привет, ${this.name}!`);
+  }
+};
+
+function displayUserInfo(user) {
+  console.log(`Имя: ${user.name}, Возраст: ${user.age}, Email: ${user.email}`);
+}
+
+displayUserInfo(user);
+user.greet();
+
+// 4
+let students = ["Анна", "Иван", "Мария", "Алексей", "Екатерина"];
+
+students.forEach((student, index) => {
+  console.log(`Студент ${student}, ваш порядковый номер: ${index + 1}`);
+});
+
+function findLongestName(arr) {
+  return arr.reduce((longest, name) => name.length > longest.length ? name : longest, "");
+}
+
+console.log(`Самое длинное имя: ${findLongestName(students)}`);
+
+// 5
+function formatDate(date) {
+  let day = String(date.getDate()).padStart(2, '0');
+  let month = String(date.getMonth() + 1).padStart(2, '0');
+  let year = date.getFullYear();
+  let hours = String(date.getHours()).padStart(2, '0');
+  let minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${day}.${month}.${year} ${hours}:${minutes}`;
+}
+
+console.log(formatDate(new Date()));
+
+function dateDifference(date1, date2) {
+  let diffTime = Math.abs(date2 - date1);
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+
+let date1 = new Date("2024-01-01");
+let date2 = new Date();
+console.log(`Разница в днях: ${dateDifference(date1, date2)}`);
+
+// Дополнительно
+function reverseString(str) {
+  return str.split('').reverse().join('');
+}
+
+function removeVowels(str) {
+  return str.replace(/[aeiouAEIOUаеёиоуыэюяАЕЁИОУЫЭЮЯ]/g, '');
+}
+
+console.log(reverseString("Пример строки"));
+console.log(removeVowels("Пример строки"));
+
