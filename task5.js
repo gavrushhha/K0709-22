@@ -6,5 +6,5 @@ console.log(formatDate(new Date(Date.now())))
 
 
 function subDate(date1, date2) {
-    return Math.floor((date1 - date2) / (1000 * 60 * 60 * 24));
+    Math.floor((date1 - date2) / (1000 * 60 * 60 * 24));
 }
