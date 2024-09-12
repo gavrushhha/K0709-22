@@ -91,12 +91,12 @@ function formatDate(date) {
   const now = new Date(); 
   console.log(formatDate(now)); 
    
-  function daysDiff(date1, date2) { 
-    const diff = Math.abs(date1.getTime() - date2.getTime()); 
-    return Math.floor(diff / (1000 * 60 * 60 * 24));  
+  function daysDifference(date1, date2) { 
+    const difference = Math.abs(date1.getTime() - date2.getTime()); 
+    return Math.floor(difference / (1000 * 60 * 60 * 24));  
   } 
    
-  const d1 = new Date("2006-23-09"); 
-  const d2 = new Date();  
-  const diff = daysDiff(d1, d2); 
-  console.log(`${diff}`);
+  const date1 = new Date("2023-12-01"); 
+  const date2 = new Date();  
+  const difference = daysDifference(date1, date2); 
+  console.log(`${difference}`);
