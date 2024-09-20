@@ -33,7 +33,7 @@ class StringCompressor {
         let count = 0
         let string = raw_string.split('')
         string.forEach(element => {
-            if (Number.isInteger(Number(element))) {
+            if (Number.isInteger(Number.parseInt(element))) {
                 count = Number(element)
             }
             else {
