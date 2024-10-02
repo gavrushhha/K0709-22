@@ -46,7 +46,7 @@ LibraryUser.prototype.borrowBook = function (book, library) {
     const index = library.books.indexOf(book);
     if (index !== -1) {
         this.borrowedBooks.push(book);
-        library.books.splice(index, 1); // Удаляем книгу из библиотеки
+        library.books.splice(index, 1);
         console.log(`${this.name} взял(а) книгу "${book.title}".`);
     } else {
         console.log(`Книга "${book.title}" недоступна в библиотеке.`);
@@ -56,8 +56,8 @@ LibraryUser.prototype.borrowBook = function (book, library) {
 LibraryUser.prototype.returnBook = function (book, library) {
     const index = this.borrowedBooks.indexOf(book);
     if (index !== -1) {
-        this.borrowedBooks.splice(index, 1); // Убираем книгу из списка взятых
-        library.addBook(book); // Возвращаем книгу в библиотеку
+        this.borrowedBooks.splice(index, 1);
+        library.addBook(book);
         console.log(`${this.name} вернул(а) книгу "${book.title}" в библиотеку.`);
     } else {
         console.log(`${this.name} не имеет книги "${book.title}".`);
