@@ -1,4 +1,4 @@
-const predefinedArray = [3, 4, 5, -3, 1, 1321];
+const randArray = Array(10).fill().map(() => Math.floor(Math.random() * 100));
 
 function findMinMax(arr) {
     if (arr.length === 0) return { min: null, max: null };
@@ -15,6 +15,6 @@ function findMinMax(arr) {
     return { min, max };
 }
 
-const result = findMinMax(predefinedArray);
-console.log(predefinedArray);
+const result = findMinMax(randArray);
+console.log(randArray);
 console.log(result);

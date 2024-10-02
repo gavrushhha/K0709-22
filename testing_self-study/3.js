@@ -1,7 +1,10 @@
 const user = {
     name: "Daniil",
     age: 17,
-    email: "enail@example.com",
+    email: "daniil@example.com",
+    greet: function greet() {
+        console.log(`Привет, ${this.name}!`);
+    }
 };
 
 function displayUserInfo(user) {
@@ -13,4 +16,4 @@ function greet(user) {
 }
 
 console.log(displayUserInfo(user));
-greet(user);
+user.greet();

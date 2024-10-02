@@ -8,5 +8,6 @@ function isPrime(num) {
     return true;
 }
 
-console.log(isPrime(6)); // false
-console.log(isPrime(11)); // true
+for (let i = 2; i <= 20; i++) {
+    console.log(`${i}: ${isPrime(i)}`);
+}

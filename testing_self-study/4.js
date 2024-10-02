@@ -1,7 +1,7 @@
 const students = ["Анна", "Иван", "Мария", "Алексей", "Екатерина"];
 
 for (let i = 0; i < students.length; i++) {
-    console.log(`Студент: ${students[i]}, ваш порядковый номер: ${i}`);
+    console.log(`Студент: ${students[i]}, порядковый номер: ${i}`);
 }
 
 function findLongName(students) {
