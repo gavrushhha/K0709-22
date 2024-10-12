@@ -6,15 +6,17 @@ const rl = readline.createInterface({
 
 let lastMessage = '';
 
+// ====================== Игровой персонаж ======================
 let player = {
     name: 'Исследователь',
     health: 100,
     inventory: [],
     location: 'start',
-    coins: 100,
+    coins: 50,
     berriesCollected: false // Флаг для отслеживания сбора ягод
 };
 
+// ====================== Локации ======================
 const locations = {
     start: {
         name: 'Начальная деревня',
@@ -61,6 +63,7 @@ const locations = {
     }
 };
 
+// ====================== Очищение экрана ======================
 function clearScreen() {
     // Очищаем экран
     process.stdout.write('\x1B[2J\x1B[0f');
@@ -71,7 +74,16 @@ function clearScreen() {
     }
 }
 
+// ====================== Перемещение между локациями ======================
+function moveToLocation(nextLocation, callback) {
+    console.log('Перемещаемся в новую локацию...');
+    setTimeout(() => {
+        player.location = nextLocation;
+        callback();
+    }, 2000);  // Задержка 2 секунды для имитации перемещения
+}
 
+// ====================== Загадки для сокровищницы ======================
 const puzzles = [
     { question: 'Какой ответ на вопрос: сколько будет 20 + 22?', answer: '42' },
     { question: 'Какой цвет получается при смешивании красного и синего?', answer: 'фиолетовый' },
@@ -80,10 +92,11 @@ const puzzles = [
     { question: 'Какой месяц идет после декабря?', answer: 'январь' }
 ];
 
+// ====================== Основной цикл игры ======================
 async function gameLoop() {
     while (true) {
         const location = locations[player.location];
-        console.clear();
+        clearScreen();
         console.log(location.name);
         console.log(location.description);
 
@@ -94,13 +107,27 @@ async function gameLoop() {
         const choice = await getPlayerChoice(location.choices.length);
 
         if (location.choices[choice - 1].nextLocation) {
-            player.location = location.choices[choice - 1].nextLocation;
+            await new Promise((resolve) => {
+                moveToLocation(location.choices[choice - 1].nextLocation, resolve);
+            });
         } else if (location.choices[choice - 1].event) {
             await performEvent(location.choices[choice - 1].event);
+        }
+
+        if (player.health <= 0) {
+            console.log('Вы проиграли! Ваше здоровье исчерпано.');
+            break;
+        }
+
+        if (player.coins >= 60) {
+            clearScreen();
+            console.log('Вы собрали 100 монет и стали богатыми. Поздравляем, это победа!');
+            await askRestart();
         }
     }
 }
 
+// ====================== Функция для выбора действия игрока ======================
 async function getPlayerChoice(maxChoice) {
     return new Promise((resolve) => {
         rl.question('Введите номер действия: ', (answer) => {
@@ -109,6 +136,7 @@ async function getPlayerChoice(maxChoice) {
     });
 }
 
+// ====================== Выполнение события ======================
 async function performEvent(event) {
     switch (event) {
         case 'findBerries':
@@ -138,8 +166,8 @@ async function performEvent(event) {
     }
 }
 
+// ====================== Функция собирания ягод ======================
 async function findBerries() {
-    clearScreen();
     if (!player.berriesCollected) {
         lastMessage = 'Вы собрали редкую ягоду и восстановили 10 HP!';
         player.health += 10;
@@ -147,10 +175,11 @@ async function findBerries() {
     } else {
         lastMessage = 'Вы уже собрали ягоды в этом лесу.';
     }
+    clearScreen();
     await showStats();
 }
 
-
+// ====================== Функция сражения с волком ======================
 async function fightWolf() {
     let wolfHealth = 60; // Здоровье волка
     let playerDamage;
@@ -193,7 +222,7 @@ async function fightWolf() {
         
         // Проверка на смерть игрока
         if (player.health <= 0) {
-            console.clear();
+            clearScreen();
             console.log('Вы погибли в бою с волком!');
             console.log(`Здоровье: ${player.health}, Монеты: ${player.coins}`);
             await askRestart();
@@ -203,7 +232,7 @@ async function fightWolf() {
 
     // Проверка на победу после выхода из цикла
     if (wolfHealth <= 0) {
-        console.clear();
+        clearScreen();
         console.log('Вы победили волка!');
         player.inventory.push('Шкура волка'); // Добавление шкуры волка в инвентарь
         player.coins += 10; // Награда за победу
@@ -211,13 +240,14 @@ async function fightWolf() {
     }
 }
 
+// ====================== Функция ударов волка ======================
 function getRandomAttacks(attacks, count) {
     const shuffled = attacks.sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count);
 }
 
 async function findTreasure() {
-    console.clear();
+    clearScreen();
     const randomPuzzle = puzzles[Math.floor(Math.random() * puzzles.length)];
     
     console.log('Вы начинаете искать сокровища и находите загадку:');
@@ -233,7 +263,7 @@ async function findTreasure() {
         player.health -= 5;
 
         if (player.health <= 0) {
-            console.clear();
+            clearScreen();
             console.log('Вы погибли из-за неправильного ответа! Игра окончена.');
             await askRestart();
             return;
@@ -243,8 +273,10 @@ async function findTreasure() {
     await showStats();
 }
 
+
+// ====================== Покупка зелья ======================
 async function buyPotion() {
-    console.clear();
+    clearScreen();
     if (player.coins >= 10) {
         player.coins -= 10;
         player.inventory.push('Зелье'); // Добавление зелья в инвентарь
@@ -255,8 +287,10 @@ async function buyPotion() {
     await showStats();
 }
 
+
+// ====================== Лавка торговца ======================
 async function meetMerchant() {
-    console.clear();
+    clearScreen();
     console.log('Вы встречаете торговца, который предлагает вам свои товары.');
 
     console.log('1. Обменять предметы на монеты:');
@@ -282,8 +316,10 @@ async function meetMerchant() {
     await pause();
 }
 
+
+// ====================== Функция обмена предметов ======================
 async function exchangeItems() {
-    console.clear();
+    clearScreen();
     console.log('Выберите, что нужно обменять:');
 
     // Создаем объект с ценами предметов
@@ -317,8 +353,9 @@ async function exchangeItems() {
     await showInventory();
 }
 
+// ====================== Функция показа инвентаря ======================
 async function showInventory() {
-    console.clear();
+    clearScreen();
     if (player.inventory.length === 0) {
         console.log('Ваш инвентарь пуст.');
     } else {
@@ -330,6 +367,7 @@ async function showInventory() {
     await pause(); // Можно добавить паузу перед возвратом в игру
 }
 
+// ====================== Функция задерки текста ======================
 async function pause() {
     return new Promise((resolve) => {
         rl.question('Нажмите Enter, чтобы продолжить...', () => {
@@ -339,9 +377,9 @@ async function pause() {
 }
 
 
-
+// ====================== Функция вывода обмена ======================
 async function tradeItem(item, price) {
-    console.clear();
+    clearScreen();
     if (player.inventory.includes(item)) {
         player.inventory = player.inventory.filter(i => i !== item); // Удаляем предмет из инвентаря
         player.coins += price; // Увеличиваем количество монет
@@ -352,17 +390,10 @@ async function tradeItem(item, price) {
     await showStats();
 }
 
-// Остальные функции остаются без изменений
 
-
-// Остальные функции остаются без изменений
-
-
-// Остальные функции остаются без изменений
-
-
+// ====================== Функция покупки здоровья ======================
 async function buyHealth() {
-    console.clear();
+    clearScreen();
     const healthCost = 20;
 
     if (player.coins >= healthCost) {
@@ -375,8 +406,9 @@ async function buyHealth() {
     await showStats();
 }
 
+// ====================== Функция покупки монет ======================
 async function sellHealth() {
-    console.clear();
+    clearScreen();
     if (player.health > 10) { // Проверяем, достаточно ли здоровья для обмена
         player.coins += 20; // Начисляем 20 монет
         player.health -= 10; // Уменьшаем здоровье
@@ -387,8 +419,9 @@ async function sellHealth() {
     await showStats();
 }
 
+// ====================== Функция покупки артефакта ======================
 async function buyArtifact() {
-    console.clear();
+    clearScreen();
     const artifactCost = 50;
 
     if (player.coins >= artifactCost) {
@@ -401,33 +434,13 @@ async function buyArtifact() {
     await showStats();
 }
 
-
-async function tradeWolfSkin() {
-    console.clear();
-    const wolfSkinIndex = player.inventory.indexOf('Шкура волка');
-
-    if (wolfSkinIndex !== -1) {
-        player.inventory.splice(wolfSkinIndex, 1); // Удаляем шкуру волка из инвентаря
-        player.coins += 15; // Начисляем 15 монет за шкуру волка
-        console.log('Вы обменяли шкуру волка на 15 монет.');
-    } else {
-        console.log('У вас нет шкуры волка для обмена.');
-    }
-    await showStats();
-}
-
-async function showInventory() {
-    console.clear();
-    console.log('Ваш инвентарь:');
-    console.log(player.inventory.length ? player.inventory.join(', ') : 'Инвентарь пуст.');
-    await showStats();
-}
-
+// ====================== Функция показа статов ======================
 async function showStats() {
     console.log(`Здоровье: ${player.health}, Монеты: ${player.coins}`);
     await pause();
 }
 
+// ====================== Функция получения ответа на квиз ======================
 async function getPuzzleAnswer() {
     return new Promise((resolve) => {
         rl.question('Введите ваш ответ: ', (answer) => {
@@ -436,14 +449,7 @@ async function getPuzzleAnswer() {
     });
 }
 
-async function pause() {
-    return new Promise((resolve) => {
-        rl.question('Нажмите Enter, чтобы продолжить...', () => {
-            resolve();
-        });
-    });
-}
-
+// ====================== Предложение начать игру заново======================
 async function askRestart() {
     const answer = await new Promise((resolve) => {
         rl.question('Хотите начать заново? (да/нет): ', (input) => {
@@ -460,6 +466,7 @@ async function askRestart() {
     }
 }
 
+// ====================== Функция пперезапуска игры ======================
 function resetGame() {
     player.health = 100;
     player.coins = 0;
@@ -468,4 +475,5 @@ function resetGame() {
     player.berriesCollected = false; // Сбрасываем флаг на сбор ягод
 }
 
+console.log('Добро пожаловать в "Мир путешествий"!');
 gameLoop();
