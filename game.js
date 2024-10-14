@@ -12,7 +12,7 @@ let player = {
     health: 100,
     inventory: [],
     location: 'start',
-    coins: 50,
+    coins: 95,
     berriesCollected: false // Флаг для отслеживания сбора ягод
 };
 
@@ -119,7 +119,7 @@ async function gameLoop() {
             break;
         }
 
-        if (player.coins >= 60) {
+        if (player.coins >= 100) {
             clearScreen();
             console.log('Вы собрали 100 монет и стали богатыми. Поздравляем, это победа!');
             await askRestart();
@@ -216,10 +216,10 @@ async function fightWolf() {
 
         console.log(`Вы используете ${randomAttacks[choice - 1].name} и наносите ${playerDamage} урона волку.`);
         console.log(`Волк наносит вам ${wolfDamage} урона.`);
-        
+
         console.log(`Здоровье волка: ${wolfHealth}`);
         console.log(`Ваше здоровье: ${player.health}`);
-        
+
         // Проверка на смерть игрока
         if (player.health <= 0) {
             clearScreen();
@@ -249,10 +249,10 @@ function getRandomAttacks(attacks, count) {
 async function findTreasure() {
     clearScreen();
     const randomPuzzle = puzzles[Math.floor(Math.random() * puzzles.length)];
-    
+
     console.log('Вы начинаете искать сокровища и находите загадку:');
     console.log(randomPuzzle.question);
-    
+
     const answer = await getPuzzleAnswer();
 
     if (answer.toLowerCase() === randomPuzzle.answer.toLowerCase()) {
@@ -269,7 +269,7 @@ async function findTreasure() {
             return;
         }
     }
-    
+
     await showStats();
 }
 
