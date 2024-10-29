@@ -78,7 +78,7 @@ class Simulation {
             bus.move();
         });
 
-        Object.values(this.stops).forEach(stop => {
+        this.stops.forEach(stop => {
             console.log(stop.status());
         });
 
@@ -88,10 +88,10 @@ class Simulation {
 
 
 let stops = {
-    "Stop 1": new Stop("1"),
-    "Stop 2": new Stop("2"),
-    "Stop 3": new Stop("3"),
-    "Stop 4": new Stop("4")
+    "Stop 1": new Stop("Stop 1"),
+    "Stop 2": new Stop("Stop 2"),
+    "Stop 3": new Stop("Stop 3"),
+    "Stop 4": new Stop("Stop 4")
 };
 
 
