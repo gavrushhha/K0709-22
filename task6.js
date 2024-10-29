@@ -1,10 +1,9 @@
 async function* checkServerStatus() {
     while (true) {
-        const response = await fetch('https://jsonplaceholder.typicode.com/todos/1');
-        const data = await response.json();
-        yield data.status;
+        const response = await fetch('https://jsonplaceholder.typicode.com/todos/1');        
+        yield response.status;
 
-        if (data.status === "OK") {
+        if (response.status === 200) {
             return;
         }
 
@@ -16,7 +15,7 @@ async function runCheckServerStatus() {
     for await (const status of checkServerStatus()) {
         console.log(status);
 
-        if (status === "OK") {
+        if (status === 200) {
             console.log('Got status OK')
             break;
         }
