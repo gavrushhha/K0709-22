@@ -1,0 +1,182 @@
+// Задача 1: Генератор последовательности чисел Фибоначчи
+
+// Реализуйте генератор fibonacci, который будет возвращать последовательность чисел Фибоначчи. Начните с чисел 0 и 1, и каждый следующий элемент должен быть суммой двух предыдущих.
+
+// Проверка:
+
+//     Создайте экземпляр генератора и выведите первые 10 чисел Фибоначчи.
+
+
+
+
+function* fibbonachi() {
+    let p = 0;
+    let prev = 1;
+    let sum = 0
+    while (true) {
+        yield sum
+        sum = p + prev
+        prev = p
+        p = sum
+    }
+}
+
+const f = fibbonachi();
+console.log(f.next().value)
+console.log(f.next().value)
+console.log(f.next().value)
+console.log(f.next().value)
+console.log(f.next().value)
+console.log(f.next().value)
+console.log(f.next().value)
+console.log(f.next().value)
+console.log(f.next().value)
+console.log(f.next().value)
+
+// Задача 2: Асинхронный генератор для получения данных о пользователях
+
+// Напишите асинхронный генератор fetchUsers, который будет принимать массив идентификаторов пользователей и запрашивать данные для каждого пользователя по API, используя fetch. Используйте фиктивный URL https://jsonplaceholder.typicode.com/users/{userId} для запроса информации о пользователе.
+
+// Проверка:
+
+//     Передайте в генератор массив const userIds = [1, 2, 3].
+//     Выведите данные о каждом пользователе по мере их получения.
+
+
+async function* fetchUsers(userIds) {
+    for (const userId of userIds) {
+        const response = await fetch(`https://jsonplaceholder.typicode.com/users/${userId}`);
+        if (!response.ok) {
+            throw new Error(`Error fetching user ${userId}: ${response.statusText}`);
+        }
+        const userData = await response.json();
+        yield userData;
+    }
+}
+
+const userIds = [1, 2, 3];
+
+(async () => {
+    for await (const user of fetchUsers(userIds)) {
+        console.log(user);
+    }
+})();
+
+
+// Задача 3: Имитация ленивой загрузки изображений
+
+// Создайте функцию lazyLoadImages, которая принимает массив изображений и "загружает" их, используя задержку. Реализуйте это как генератор, где каждое изображение "загружается" с задержкой в 1 секунду (имитируется с помощью setTimeout или await).
+
+// Проверка:
+
+//     Создайте массив с путями к изображениям: ["image1.jpg", "image2.jpg", "image3.jpg"].
+//     Используйте генератор для вывода в консоль "Загружено: imageX.jpg".
+
+
+async function lazyLoadImages(imagePaths) {
+    for (const imagePath of imagePaths) {
+        await new Promise((resolve) => {
+            setTimeout(() => {
+                console.log(`Загружено: ${imagePath}`);
+                resolve();
+            }, 1000);
+        });
+    }
+}
+
+const images = ["image1.jpg", "image2.jpg", "image3.jpg"];
+
+(async () => {
+    await lazyLoadImages(images);
+})();
+
+
+// Задача 4: Чтение файлов из каталога (имитация)
+
+// Напишите генератор readFiles, который "читает" файлы из каталога. Используйте массив имён файлов и возвращайте каждое имя по одному при каждом вызове next(). Для упрощения задачи можно использовать массив ["file1.txt", "file2.txt", "file3.txt"], представляющий файлы в каталоге.
+
+// Проверка:
+
+//     Создайте экземпляр генератора и выведите все имена файлов.
+
+
+function* readFiles(fileNames) {
+    for (const fileName of fileNames) {
+        yield fileName;
+    }
+}
+
+const files = ["file1.txt", "file2.txt", "file3.txt"];
+const fileGenerator = readFiles(files);
+
+for (const file of fileGenerator) {
+    console.log(file);
+}
+
+
+
+
+// Задача 5: Асинхронный генератор для задержек
+
+// Напишите асинхронный генератор delayedCounter, который принимает максимальное число и задержку в миллисекундах. Он должен возвращать числа от 1 до максимального с заданной задержкой.
+
+// Проверка:
+
+//     Передайте в генератор max = 5 и задержку в 500 мс. Выведите каждое значение с указанной задержкой.
+
+
+async function* delayedCounter(max, delay) {
+    for (let i = 1; i <= max; i++) {
+        await new Promise(resolve => setTimeout(resolve, delay));
+        yield i;
+    }
+}
+
+const max = 5;
+const delay = 500;
+
+(async () => {
+    for await (const number of delayedCounter(max, delay)) {
+        console.log(number);
+    }
+})();
+
+
+// Задача 6: Асинхронный генератор для проверки статуса сервера
+
+// Реализуйте асинхронный генератор checkServerStatus, который каждую секунду проверяет статус сервера. Генератор должен завершиться, если статус "OK". Используйте fetch('https://jsonplaceholder.typicode.com/todos/1') как пример для имитации запроса на сервер.
+
+// Проверка:
+
+//     Создайте асинхронную функцию, которая запускает генератор и завершает выполнение при получении статуса "OK".
+
+
+async function* checkServerStatus() {
+    while (true) {
+        const response = await fetch('https://jsonplaceholder.typicode.com/todos/1');
+        const data = await response.json();
+        
+        if (data && data.completed) {
+            yield 'OK';
+            break;
+        } else {
+            yield 'Not OK';
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+}
+
+async function monitorServer() {
+    const generator = checkServerStatus();
+    
+    for await (const status of generator) {
+        console.log(status);
+        if (status === 'OK') {
+            console.log('Server is up and running!');
+            break;
+        }
+    }
+}
+
+monitorServer();
