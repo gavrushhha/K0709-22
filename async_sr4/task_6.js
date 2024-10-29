@@ -1,19 +1,18 @@
 async function* checkServerStatus() {
     while (true) {
-        const response = await fetch('https://jsonplaceholder.typicode.com/todos/1')
-        if (!response.ok) {
-            console.error('Server is not responding')
-            yield new Promise(resolve => setTimeout(resolve, 1000))
-        } else {
-            console.log('Server is responding')
-            return
-        }
+        const response = await fetch('https://jsonplaceholder.typicode.com/todos/1l.jkh,jgmf')
+        yield response.status
     }
 }
 
 (async () => {
     const checker = checkServerStatus()
     for await (const status of checker) {
-        console.log(status)
+        if (status != 200) {
+            console.error('Server is not responding')
+        } else {
+            console.log('Server is responding')
+            return
+        }
     }
 })()
