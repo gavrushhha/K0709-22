@@ -1,66 +1,68 @@
 const axios = require('axios');
 
-const API_KEY = 'f3c98864a2d84c1abf4111714243110';
-const country = 'Colombia';
+const API_KEY = 'fdcd64a8d3f64f0382183538240411';
+const COUNTRY = 'Colombia';
 
-async function getForecastData() {
-    const response = await axios.get('https://api.weatherapi.com/v1/forecast.json', {
-        params: {
-            key: API_KEY,
-            q: country,
-            days: 30, // Запрашиваем прогноз на 30 дней
-        }
-    });
-    console.log(response.data);
-    return response.data;
+async function getWeatherData(country, date) {
+    try {
+        const response = await axios.get('https://api.worldweatheronline.com/premium/v1/past-weather.ashx', {
+            params: {
+                key: API_KEY,
+                q: country,
+                date: date,
+                format: 'json'
+            }
+        });
+        return response.data.data.weather[0];
+    } catch (error) {
+        console.error(`Ошибка при запросе данных за ${date}: ${error.message}`);
+        return null;
+    }
 }
 
-async function findBestMonth() {
-    const data = await getForecastData();
-
-    const monthlyWeather = {};
-
-    data.forecast.forecastday.forEach(day => {
-        const month = day.date.split('-')[1]; // Получаем месяц из даты
-        const avgTemp = day.day.avgtemp_c;
-        const totalPrecipitation = day.day.totalprecip_mm;
-        const isSunny = day.day.condition.text.includes('Sunny');
-
-        if (!monthlyWeather[month]) {
-            monthlyWeather[month] = {
-                avgTemp: 0,
-                totalPrecipitation: 0,
-                sunnyDays: 0,
-                count: 0
-            };
-        }
-
-        monthlyWeather[month].avgTemp += avgTemp;
-        monthlyWeather[month].totalPrecipitation += totalPrecipitation;
-        monthlyWeather[month].sunnyDays += isSunny ? 1 : 0;
-        monthlyWeather[month].count += 1;
-    });
-
+async function findBestTravelMonth(country) {
+    const months = Array.from({ length: 12 }, (_, i) => i + 1);
     let bestMonth = null;
     let bestScore = -Infinity;
 
-    Object.entries(monthlyWeather).forEach(([month, stats]) => {
-        const avgTemp = stats.avgTemp / stats.count;
-        const totalPrecipitation = stats.totalPrecipitation;
-        const sunnyDays = stats.sunnyDays;
+    for (const month of months) {
+        const date1 = `2023-${month.toString().padStart(2, '0')}-01`;
+        const date2 = `2023-${month.toString().padStart(2, '0')}-15`;
 
-        // Пример расчета балла (можно настроить под свои нужды)
-        const score = (avgTemp * 2) + (sunnyDays * 3) - totalPrecipitation;
+        // Параллельные запросы на 1 и 15 числа месяца
+        const [data1, data2] = await Promise.all([
+            getWeatherData(country, date1),
+            getWeatherData(country, date2)
+        ]);
 
-        if (score > bestScore) {
-            bestScore = score;
+        if (!data1 || !data2) continue;
+
+        // Средние значения параметров по двум датам
+        const avgTemp = (parseFloat(data1.avgtempC) + parseFloat(data2.avgtempC)) / 2;
+        const avgHumidity = (data1.hourly.reduce((acc, h) => acc + parseInt(h.humidity), 0) / data1.hourly.length +
+            data2.hourly.reduce((acc, h) => acc + parseInt(h.humidity), 0) / data2.hourly.length) / 2;
+        const avgPrecipitation = (data1.hourly.reduce((acc, h) => acc + parseFloat(h.precipMM), 0) / data1.hourly.length +
+            data2.hourly.reduce((acc, h) => acc + parseFloat(h.precipMM), 0) / data2.hourly.length) / 2;
+
+        // Расчет "оценки условий" для месяца
+        const tempScore = Math.max(0, 30 - Math.abs(25 - avgTemp));
+        const humidityScore = Math.max(0, 50 - Math.abs(50 - avgHumidity));
+        const precipitationScore = Math.max(0, 50 - (avgPrecipitation * 100));
+
+        const monthScore = tempScore + humidityScore + precipitationScore;
+        console.log(`Месяц ${month}: Средняя температура: ${avgTemp}°C, Средняя влажность: ${avgHumidity}%, Средние осадки: ${avgPrecipitation} мм, Оценка: ${monthScore}`);
+
+        if (monthScore > bestScore) {
+            bestScore = monthScore;
             bestMonth = month;
         }
-    });
+    }
 
-    console.log(`Лучший месяц для путешествия в Колумбию: ${bestMonth}`);
+    return bestMonth;
 }
 
-findBestMonth().catch(error => {
-    console.error('Ошибка при получении данных:', error);
+findBestTravelMonth(COUNTRY).then(bestMonth => {
+    console.log(`Наиболее подходящий месяц для поездки в Колумбию: ${bestMonth}`);
+}).catch(error => {
+    console.error('Ошибка при поиске лучшего месяца:', error.message);
 });
