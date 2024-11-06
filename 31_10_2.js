@@ -28,7 +28,7 @@ async function getAccessToken() {
     }
 }
 
-async function fetchSpotifyData(url, accessToken) {
+async function fetchData(url, accessToken) {
     try {
         const response = await axios.get(url, {
             headers: { Authorization: `Bearer ${accessToken}` }
@@ -40,12 +40,12 @@ async function fetchSpotifyData(url, accessToken) {
     }
 }
 
-async function crawlSpotify(url, accessToken, depth = 0) {
+async function crawl(url, accessToken, depth = 0) {
     if (depth > MAX_DEPTH || visited.has(url)) return;
     console.log(`Crawling URL: ${url} at depth ${depth}`);
     visited.add(url);
 
-    const data = await fetchSpotifyData(url, accessToken);
+    const data = await fetchData(url, accessToken);
     if (!data) return;
 
     let links = [];
@@ -77,7 +77,7 @@ async function crawlSpotify(url, accessToken, depth = 0) {
     const uniqueLinks = Array.from(new Set(links)).slice(0, MAX_REQUESTS_PER_LEVEL);
 
     for (const link of uniqueLinks) {
-        await crawlSpotify(link, accessToken, depth + 1);
+        await crawl(link, accessToken, depth + 1);
     }
 }
 
@@ -89,7 +89,7 @@ async function startCrawling(artistId) {
     }
 
     const artistUrl = `${SPOTIFY_BASE_URL}/artists/${artistId}`;
-    await crawlSpotify(artistUrl, accessToken);
+    await crawl(artistUrl, accessToken);
 }
 
 const LINKIN_PARK_ID = "6XyY86QOPPrYVGvF9ch6wz";
