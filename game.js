@@ -12,7 +12,7 @@ let player = {
     health: 100,
     inventory: [],
     location: 'start',
-    coins: 95,
+    coins: 80,
     berriesCollected: false // Флаг для отслеживания сбора ягод
 };
 
@@ -216,10 +216,10 @@ async function fightWolf() {
 
         console.log(`Вы используете ${randomAttacks[choice - 1].name} и наносите ${playerDamage} урона волку.`);
         console.log(`Волк наносит вам ${wolfDamage} урона.`);
-
+        
         console.log(`Здоровье волка: ${wolfHealth}`);
         console.log(`Ваше здоровье: ${player.health}`);
-
+        
         // Проверка на смерть игрока
         if (player.health <= 0) {
             clearScreen();
@@ -246,13 +246,15 @@ function getRandomAttacks(attacks, count) {
     return shuffled.slice(0, count);
 }
 
+
+// ====================== Функция разгадывания загадок ======================
 async function findTreasure() {
     clearScreen();
     const randomPuzzle = puzzles[Math.floor(Math.random() * puzzles.length)];
-
+    
     console.log('Вы начинаете искать сокровища и находите загадку:');
     console.log(randomPuzzle.question);
-
+    
     const answer = await getPuzzleAnswer();
 
     if (answer.toLowerCase() === randomPuzzle.answer.toLowerCase()) {
@@ -269,7 +271,7 @@ async function findTreasure() {
             return;
         }
     }
-
+    
     await showStats();
 }
 
