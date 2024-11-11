@@ -1,20 +1,15 @@
 
-// const WEATHER_APIS = [
-//     { url: `https://api.openweathermap.org/data/3.0/forecast`, key: `d52645c8877b641a9a2e4e0c7b1c4f6f` },
-//     { url: `https://api.weatherapi.com/v1/forecast.json`, key: `1abce71204b045d4b57102042243110` },
-// 89498453030d470c89bf20d923e01d0e
 
 const axios = require(`axios`);
 
-// API configurations
 const WEATHER_API = {
     url: `https://api.weatherapi.com/v1/forecast.json`, 
-    key: `1abce71204b045d4b57102042243110`
+    key: ``
 };
 
 const WEATHERBIT_API = {
     url: `https://api.weatherbit.io/v2.0/forecast/daily`, 
-    key: `89498453030d470c89bf20d923e01d0e`
+    key: ``
 };
 
 async function fetchWeatherAPI(city, days) {
@@ -45,7 +40,9 @@ async function fetchWeatherbitAPI(lat, lon, days) {
         const response = await axios.get(WEATHERBIT_API.url, { params });
         return response.data;
     } catch (error) {
+        console.log(`Один в поле не двое, один в поле - одное`)
         console.error(`Error fetching data from Weatherbit API: ${error.message}`);
+        console.log(`Лимит запросов на данный апи исчерпался, всем пока.`)
         return null; 
     }
 }
@@ -58,8 +55,9 @@ async function findBestTravelMonth(city, lat, lon) {
         const weatherAPIData = await fetchWeatherAPI(city, 10); 
         const weatherbitData = await fetchWeatherbitAPI(lat, lon, 10); 
 
-        if (!weatherAPIData && !weatherbitData) continue;
-
+        if (!weatherAPIData && !weatherbitData){
+             continue;
+        }
         let totalTemp = 0;
         let totalRainfall = 0;
         let sunnyDays = 0;
