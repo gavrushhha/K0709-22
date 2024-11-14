@@ -94,10 +94,12 @@ async function fetchWithLimit(URL, triesNumber)  {
         return
     }
     console.log('очень нездравый сайт')
-    throw new Error("Запрос не удался")
+    throw new Error("Запрос не удался , скорее всего потому что ссылка заранее нерабочая ")
 }
 fetchWithLimit('https://gayporn.com/', 20)
+// Здравая ссылка
 fetchWithLimit('https://fimozSterlyagova.com/', 20)
+// Заведомо нерабочая ссылка
 
 
 
